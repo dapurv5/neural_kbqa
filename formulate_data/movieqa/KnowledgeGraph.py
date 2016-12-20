@@ -6,5 +6,6 @@ import csv
 
 class KnowledgeGraph(object):
 
-  def __init__(self):
+  def __init__(self, graph_path):
     pass
+
