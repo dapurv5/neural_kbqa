@@ -15,11 +15,13 @@ def clean_word(word):
   word = word.replace('"', '')
   word = word.replace('\'', '')
   word = word.replace('?', '')
+  word = word.replace('|', '')
   return word
 
 
 def clean_line(line):
   line = line.strip('\n')
+  line = line.strip('\r')
   line = line.strip()
   line = line.lower()
   return line
