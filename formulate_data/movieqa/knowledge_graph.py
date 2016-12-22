@@ -79,7 +79,10 @@ class KnowledgeGraph(object):
     return result
 
   def log_statistics(self):
-    print "NUM_NODES", len(nx.nodes(self.G))
+    print "NUM_NODES", len(self.get_entities())
+
+  def get_entities(self):
+    return set(nx.nodes(self.G))
 
 
 if __name__ == "__main__":
@@ -88,3 +91,5 @@ if __name__ == "__main__":
   entities_paths, relations_paths = kb.get_all_paths(source="moonraker", target="lewis gilbert", cutoff=3)
   print kb.get_candidate_neighbors("moonraker")
   print len(kb.get_candidate_neighbors("moonraker", num_hops=2))
+  kb.log_statistics()
+  print kb.get_candidate_neighbors("what", num_hops=1)

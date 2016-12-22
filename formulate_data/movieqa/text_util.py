@@ -20,6 +20,9 @@ def clean_word(word):
 
 
 def clean_line(line):
+  """
+  Do not replace PIPE here.
+  """
   line = line.strip('\n')
   line = line.strip('\r')
   line = line.strip()

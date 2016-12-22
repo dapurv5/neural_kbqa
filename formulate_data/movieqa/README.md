@@ -12,6 +12,10 @@ python clean_kb.py --input_kb $HOME/Downloads/qa_datasets/movieqa/knowledge_sour
 python clean_qa.py --input_examples $HOME/Downloads/qa_datasets/movieqa/questions/full/full_qa_dev.txt --input_entities $HOME/Downloads/qa_datasets/movieqa_clean/clean_entities.txt --output_examples $HOME/Downloads/qa_datasets/movieqa_clean/clean_full_qa_dev.txt
 
 python clean_qa.py --input_examples $HOME/Downloads/qa_datasets/movieqa/questions/wiki_entities/wiki-entities_qa_train.txt --input_entities $HOME/Downloads/qa_datasets/movieqa_clean/clean_entities.txt --output_examples $HOME/Downloads/qa_datasets/movieqa_clean/clean_wiki-entities_qa_train.txt
+
+python gen_stopwords.py --input_examples ../../data/movieqa/clean_wiki-entities_qa_train.txt  --output ../../data/movieqa/stopwords.txt
+
+
 ```
 
 ### LICENSE

@@ -1,0 +1,255 @@
+a	9499
+a few	2470
+a film	1975
+a movie	726
+a writer	1349
+about	3947
+act	2525
+act in	2507
+acted	3244
+acted in	3244
+actor	863
+actor in	862
+actors	3256
+actors in	1604
+an	1089
+an actor	862
+and	2350
+and the	734
+appear	1692
+appear in	1692
+appears	861
+appears in	861
+are	4335
+are about	1675
+are the	1622
+as	930
+as director	834
+author	604
+author of	603
+be	2362
+be described	2175
+by	7645
+by this	587
+by who	1505
+can	4048
+can be	2175
+can you	1802
+creator	641
+creator of	638
+date	3093
+date of	3042
+describe	4979
+describe film	1032
+describe movie	1439
+describe the	939
+described	2175
+described by	1754
+describing	967
+did	10244
+direct	2048
+directed	7766
+directed by	2574
+directed the	2450
+directed which	692
+director	8821
+director for	2046
+director of	5550
+director that	873
+does	3904
+fall	593
+fall under	515
+few	2470
+few words	2452
+film	20248
+film did	2048
+film directed	703
+film genre	522
+film is	2084
+film script	638
+film the	2854
+film written	1242
+films	7349
+films are	843
+films can	880
+films did	3434
+films does	857
+films was	671
+for	7509
+for the	2003
+from	517
+genre	7194
+genre does	515
+genre for	1509
+genre is	1048
+genre of	4122
+girl	509
+give	1009
+give a	970
+i	670
+in	24256
+in a	1722
+in the	5560
+in which	862
+is	21907
+is a	2488
+is listed	834
+is movie	540
+is the	11804
+it	2355
+it released	1967
+john	635
+kind	1125
+kind of	1073
+language	2608
+language in	883
+language is	871
+language spoken	849
+last	516
+life	512
+listed	834
+listed as	834
+love	899
+man	1218
+me	563
+movie	19526
+movie did	1342
+movie is	2107
+movie the	3299
+movie written	693
+movies	9946
+movies are	831
+movies can	1295
+movies did	3012
+movies was	2901
+my	820
+night	642
+of	31171
+of a	557
+of film	2080
+of movie	2088
+of the	11977
+of which	661
+on	2564
+person	2668
+person directed	892
+person wrote	1180
+primary	616
+primary language	605
+release	5974
+release date	3042
+release year	2927
+released	7879
+screenplay	584
+screenplay for	583
+screenwriter	624
+screenwriter wrote	624
+script	1262
+script for	1262
+some	503
+sort	1038
+sort of	1038
+spoken	849
+spoken in	849
+star	2739
+star in	2601
+starred	4856
+starred in	1633
+starred which	1646
+starred who	1571
+stars	1671
+stars in	1627
+story	1734
+story for	1370
+that	1559
+that directed	873
+the	78244
+the actors	1604
+the author	603
+the creator	638
+the director	7983
+the film	12558
+the genre	4538
+the language	849
+the movie	12844
+the primary	605
+the release	5969
+the screenplay	583
+the script	624
+the story	1431
+the world	765
+the writer	4410
+this	767
+this person	587
+to	2031
+topics	1589
+topics is	1589
+type	996
+type of	996
+under	642
+was	27716
+was directed	925
+was it	1962
+was the	15390
+was who	871
+was written	580
+what	41934
+what does	2516
+what film	1226
+what films	5103
+what genre	2134
+what is	6598
+what kind	1039
+what language	871
+what movie	670
+what movies	5496
+what sort	1038
+what topics	532
+what type	996
+what was	7821
+what words	1047
+what year	2910
+when	5115
+when was	4969
+which	15953
+which actors	1646
+which film	1343
+which films	2240
+which movie	1017
+which movies	4444
+which person	2072
+which screenwriter	624
+which topics	1057
+which words	1499
+who	27772
+who acted	3244
+who are	1604
+who directed	2735
+who in	615
+who is	6015
+who starred	1634
+who stars	1621
+who was	3698
+who wrote	2414
+whos	1581
+whos the	1537
+with	1021
+words	5493
+words describe	2546
+words describing	967
+world	945
+world wrote	615
+write	4702
+write the	1370
+writer	5765
+writer of	4410
+writer on	1349
+written	3141
+written by	3136
+wrote	4833
+wrote the	3466
+year	5976
+year of	2953
+year was	2913
+you	2299
+you give	967

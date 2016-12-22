@@ -49,7 +49,7 @@ def main(args):
 
 
 def write_doc(e1, e2s, relation, valid_entities_set, doc_writer):
-  dict = {'entity': e1, 'content': e2s, 'fieldname': relation}
+  dict = {'entity': e1, 'content': clean_word(e2s), 'fieldname': relation}
   if e1 in valid_entities_set:
     doc_writer.writerow(dict)
 
