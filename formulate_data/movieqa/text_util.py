@@ -3,10 +3,11 @@
 """
 Utilities for cleaning the text data
 """
-
+import unicodedata
 
 def clean_word(word):
   word = word.strip('\n')
+  word = word.strip('\r')
   word = word.lower()
   word = word.replace('%', '') #99 and 44/100% dead
   word = word.strip()
@@ -16,6 +17,9 @@ def clean_word(word):
   word = word.replace('\'', '')
   word = word.replace('?', '')
   word = word.replace('|', '')
+  word = unicode(word, "utf-8") #Convert str -> unicode (Remember default encoding is ascii in python)
+  word = unicodedata.normalize('NFKD', word).encode('ascii','ignore') #Convert normalized unicode to python str
+  word = word.lower() #Don't remove this line, lowercase after the unicode normalization
   return word
 
 

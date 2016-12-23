@@ -31,17 +31,40 @@ def main(args):
           if word in valid_entities_set:
             valid_ans_entities.append(word)
           else:
-            has_invalid_word = True
+            has_invalid_word = True #there's a comma in one of the ans_entities
 
         if has_invalid_word:
-          ans = ans.replace(",", "")
-          for entity in valid_entities_set:
-            if ans.find(entity) > -1:
-              valid_ans_entities.append(entity)
+          is_a_valid_split, valid_ans_entities = get_valid_entities(ans_entities, valid_entities_set, 0)
+          valid_ans_entities = list(reversed(valid_ans_entities))
 
-        writer.writerow({'question': ' '.join(q_words), 'answer': '|'.join(ans_entities)})
+        #lastly if the line was messed up and you couldn't find valid entities, pick as many you can find and leave the invalid ones
+        if len(valid_ans_entities) == 0:
+          for word in ans_entities:
+            if word in valid_entities_set:
+              valid_ans_entities.append(word)
+
+        if len(valid_ans_entities) > 0:
+          writer.writerow({'question': ' '.join(q_words), 'answer': '|'.join(valid_ans_entities)})
 
 
+def get_valid_entities(potential_entities, dictionary, pos):
+  if pos >= len(potential_entities):
+    return True, []
+
+  for i in range(pos, len(potential_entities)):
+    chunk = " ".join(potential_entities[pos:i+1])
+    if chunk in dictionary:
+      is_a_valid_split, chunks = get_valid_entities(potential_entities, dictionary, i+1)
+      if is_a_valid_split:
+        chunks.append(chunk)
+        return True, chunks
+  return False, []
+
+
+def test_get_valid_entities():
+  print get_valid_entities(["monster in law", "they shoot horses", "don't they", "agnes of god"],
+                           set(["monster in law", "they shoot horses don't they",
+                                "agnes", "agnes of god", "a", "agnes"]), 0)
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Specify arguments')

@@ -22,9 +22,8 @@ def main(args):
     with open(args.output, 'w') as clean_entities_file:
       for entity in entities_file:
         count_raw += 1
-        entity = clean_word(entity)
         if len(entity) > 0:
-          entities_set.add(entity)
+          entities_set.add(clean_word(entity))
       for entity in entities_set:
         count_processed += 1
         clean_entities_file.write(entity + NEWLINE)

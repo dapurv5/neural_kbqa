@@ -113,4 +113,4 @@ class QuestionParser(object):
     qn_entities = self.remove_all_stopwords_except_one(qn_entities)
     qn_entities = self.remove_substrings(qn_entities)
     qn_entities = self.remove_spurious_entities(qn_entities, question)
-    return qn_entities
+    return set(qn_entities)

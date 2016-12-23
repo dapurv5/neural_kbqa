@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
 import codecs
+import unicodedata
+
+from whoosh import qparser
 from whoosh.index import create_in
 from whoosh.fields import *
 from whoosh.qparser import QueryParser
@@ -26,11 +29,12 @@ class SearchIndex(object):
   def get_candidate_docs(self, question):
     docs = set([])
     with self.ix.searcher() as searcher:
-      query = QueryParser("content", self.ix.schema).parse(question)
+      query = QueryParser("content", self.ix.schema, group=qparser.OrGroup).parse(question)
       results = searcher.search(query)
       for result in results:
         docs.add(result['entity_name'])
-    docs = [str(doc) for doc in docs]
+    #TODO: remove the unicode normalization since this will be done earlier in the pipeline
+    docs = [unicodedata.normalize('NFKD', doc).encode('ascii','ignore') for doc in docs]
     return docs
 
 if __name__=="__main__":

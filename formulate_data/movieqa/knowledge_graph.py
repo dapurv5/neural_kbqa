@@ -84,6 +84,9 @@ class KnowledgeGraph(object):
   def get_entities(self):
     return set(nx.nodes(self.G))
 
+  def get_high_degree_entities(self):
+    return self.high_degree_nodes
+
 
 if __name__ == "__main__":
   graph_path = "../../data/movieqa/clean_wiki-entities_kb_graph.txt"
