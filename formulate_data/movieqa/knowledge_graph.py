@@ -43,6 +43,8 @@ class KnowledgeGraph(object):
     [ [e1, e2], [e1, e3, e2]], [[r1], [r2, r3] ]
     cutoff: represents the max length of the path allowed
     """
+    if source == target:
+      return [], []
     paths_of_entities = []
     paths_of_relations = []
     for path in nx.all_simple_paths(self.G, source, target, cutoff):
@@ -96,3 +98,5 @@ if __name__ == "__main__":
   print len(kb.get_candidate_neighbors("moonraker", num_hops=2))
   kb.log_statistics()
   print kb.get_candidate_neighbors("what", num_hops=1)
+  for path in kb.get_all_paths('bruce lee', 'bruce lee', cutoff=2):
+    print path
