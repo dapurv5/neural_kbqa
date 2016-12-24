@@ -9,7 +9,7 @@ from clean_utils import read_file_as_dict
 from knowledge_graph import KnowledgeGraph
 from search_index import SearchIndex
 from question_parser import QuestionParser
-from conf import *
+from conf.conf import *
 
 from tqdm import tqdm
 
