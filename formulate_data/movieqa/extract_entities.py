@@ -45,7 +45,7 @@ class EntityExtractor(object):
     return self.get_neighboring_entities(qn_entities, num_hops=HOPS_FROM_QN_ENTITY)
 
   def get_neighboring_relevant_entities(self, relevant_entities):
-    if not USE_RELEVANT_ENTITIES:
+    if not USE_NBR_RELEVANT_ENTITIES:
       return set([])
     return self.get_neighboring_entities(relevant_entities, num_hops=HOPS_FROM_RELEVANT_ENTITY)
 
