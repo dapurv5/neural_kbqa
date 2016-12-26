@@ -19,7 +19,7 @@ COMMA = ","
 class EntityExtractor(object):
   def __init__(self, input_graph, input_doc, stopwords):
     self.kb = KnowledgeGraph(input_graph, unidirectional=False)
-    self.index = SearchIndex(input_doc)
+    self.index = SearchIndex(input_doc, stopwords)
     valid_entities_set = self.kb.get_entities()
     stop_vocab = read_file_as_dict(stopwords)
     self.qp = QuestionParser(valid_entities_set, stop_vocab)
@@ -30,7 +30,9 @@ class EntityExtractor(object):
   def get_relevant_entities_from_index(self, question):
     if not USE_RELEVANT_ENTITIES:
       return set([])
-    return self.index.get_candidate_docs(question)
+    result = self.index.get_candidate_docs(question, limit=COUNT_RELEVANT_ENTITIES)
+    print len(result), result
+    return result
 
   def get_neighboring_entities(self, entities, num_hops=2):
     nbr_entities = set([])
@@ -107,7 +109,7 @@ def main(args):
       writer.writeheader()
       max_count_candidate_entities = 0
       max_count_candidate_paths = 0
-      for row in reader:
+      for row in tqdm(reader):
         qn_entities = ee.get_question_entities(row['question'])
         qn_entities = ee.remove_high_degree_qn_entities(qn_entities)
         ans_str = row['answer']
