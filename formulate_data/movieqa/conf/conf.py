@@ -15,3 +15,5 @@ USE_NBR_RELEVANT_ENTITIES = True
 REMOVE_HIGH_DEGREE_ANSWER_ENTITIES = False #what was the release date of the film almighty thor
 
 MAX_PATH_LENGTH = 3 #this includes the source and target entities, 3 translates to 1 intermediate node
+
+COUNT_RELEVANT_ENTITIES = 20
