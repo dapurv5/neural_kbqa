@@ -27,6 +27,16 @@ python gen_dictionaries.py
 
 
 
+python gen_kv_data.py --input_examples ../../data/movieqa/clean_wiki-entities_qa_train.txt --input_graph ../../data/movieqa/clean_wiki-entities_kb_graph.txt --input_doc ../../data/movieqa/clean_wiki-entities_kb_doc.txt --output_examples ../../data/movieqa/wiki-entities_train_kv.txt --stopwords ../../data/movieqa/stopwords.txt --mode train
+python gen_kv_data.py --input_examples ../../data/movieqa/clean_wiki-entities_qa_test.txt --input_graph ../../data/movieqa/clean_wiki-entities_kb_graph.txt --input_doc ../../data/movieqa/clean_wiki-entities_kb_doc.txt --output_examples ../../data/movieqa/wiki-entities_test_kv.txt --stopwords ../../data/movieqa/stopwords.txt --mode test
+python gen_kv_data.py --input_examples ../../data/movieqa/clean_wiki-entities_qa_dev.txt --input_graph ../../data/movieqa/clean_wiki-entities_kb_graph.txt --input_doc ../../data/movieqa/clean_wiki-entities_kb_doc.txt --output_examples ../../data/movieqa/wiki-entities_dev_kv.txt --stopwords ../../data/movieqa/stopwords.txt --mode dev
+
+python gen_kv_data.py --input_examples ../../data/movieqa/clean_full_qa_train.txt --input_graph ../../data/movieqa/clean_full_kb_graph.txt --input_doc ../../data/movieqa/clean_full_kb_doc.txt --output_examples ../../data/movieqa/full_train_kv.txt --stopwords ../../data/movieqa/stopwords.txt --mode train
+python gen_kv_data.py --input_examples ../../data/movieqa/clean_full_qa_test.txt --input_graph ../../data/movieqa/clean_full_kb_graph.txt --input_doc ../../data/movieqa/clean_full_kb_doc.txt --output_examples ../../data/movieqa/full_test_kv.txt --stopwords ../../data/movieqa/stopwords.txt --mode test
+python gen_kv_data.py --input_examples ../../data/movieqa/clean_full_qa_dev.txt --input_graph ../../data/movieqa/clean_full_kb_graph.txt --input_doc ../../data/movieqa/clean_full_kb_doc.txt --output_examples ../../data/movieqa/full_dev_kv.txt --stopwords ../../data/movieqa/stopwords.txt --mode dev
+
+
+
 ```
 
 ### LICENSE

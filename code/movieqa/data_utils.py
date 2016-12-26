@@ -2,6 +2,8 @@
 
 PIPE = "|"
 COMMA = ","
+TAB = "\t"
+SPACE = " "
 
 def union(*sets):
   target_set = set([])
