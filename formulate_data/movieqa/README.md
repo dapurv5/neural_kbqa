@@ -23,6 +23,8 @@ python clean_qa.py --input_examples $HOME/Downloads/qa_datasets/movieqa/question
 
 
 python gen_stopwords.py --input_examples ../../data/movieqa/clean_wiki-entities_qa_train.txt  --output ../../data/movieqa/stopwords.txt
+python gen_dictionaries.py
+
 
 
 ```
