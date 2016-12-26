@@ -4,6 +4,7 @@ import codecs
 import unicodedata
 
 from whoosh import qparser
+from whoosh import scoring
 from whoosh.index import create_in
 from whoosh.fields import *
 from whoosh.qparser import QueryParser
@@ -14,6 +15,7 @@ from clean_utils import read_file_as_dict
 
 
 PIPE = "|"
+SPACE = " "
 
 class SearchIndex(object):
   def __init__(self, doc_path, stopwords=None):
@@ -35,18 +37,16 @@ class SearchIndex(object):
     writer.commit()
 
   def remove_stopwords_from_text(self, content):
-    words = content.split(" ")
+    words = content.split(SPACE)
     words_clean = []
-    for word in content.split(" "):
+    for word in words:
       if self.remove_stopwords_while_indexing and word not in self.stopwords_dict:
         words_clean.append(word)
-    if len(words_clean) > 0:
-      return " ".join(words_clean)
-    else:
-      return content
+    return " ".join(words_clean) if len(words_clean) > 0 else content
 
-  def get_candidate_docs(self, question, limit=30):
+  def get_candidate_docs(self, question, limit=20):
     docs = set([])
+    question = self.remove_stopwords_from_text(question)
     with self.ix.searcher() as searcher:
       query = QueryParser("content", self.ix.schema, group=qparser.OrGroup).parse(question)
       results = searcher.search(query, limit=limit)

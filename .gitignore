@@ -87,3 +87,5 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+data/movieqa/wiki-entities_train_kv.txt

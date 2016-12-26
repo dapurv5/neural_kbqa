@@ -29,6 +29,7 @@ class KnowledgeGraph(object):
     for v in indeg:
       if indeg[v] > HIGH_DEGREE_THRESHOLD:
         self.high_degree_nodes.add(v)
+    self.all_entities = set(nx.nodes(self.G))
 
 
   def get_inverse_relation(self, relation):
@@ -80,11 +81,17 @@ class KnowledgeGraph(object):
     result.remove(node)
     return result
 
+  def get_adjacent_entities(self, node):
+    return set(self.G.neighbors(node))
+
+  def get_relation(self, source, target):
+    return self.G[source][target]['relation']
+
   def log_statistics(self):
     print "NUM_NODES", len(self.get_entities())
 
   def get_entities(self):
-    return set(nx.nodes(self.G))
+    return self.all_entities
 
   def get_high_degree_entities(self):
     return self.high_degree_nodes
