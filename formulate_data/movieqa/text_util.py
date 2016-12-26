@@ -38,3 +38,6 @@ def append_word_to_str(text, str):
     return str
   else:
     return text + " " + str
+
+if __name__ == "__main__":
+  print "__"+clean_word("  ")+"__"
