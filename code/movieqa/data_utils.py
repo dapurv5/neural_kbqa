@@ -28,3 +28,10 @@ def get_str_of_nested_seq(paths):
   for path in paths:
     result.append(COMMA.join(path))
   return PIPE.join(result)
+
+
+def pad(arr, L):
+  assert (len(arr) <= L)
+  while len(arr) < L:
+    arr.append(0)
+  return arr

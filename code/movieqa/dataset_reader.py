@@ -50,9 +50,14 @@ class DatasetReader(object):
         vec_example['sources'] = [entity_idx[entity] for entity in example['sources']]
         vec_example['relations'] = [relation_idx[relation] for relation in example['relations']]
         vec_example['targets'] = [entity_idx[entity] for entity in example['targets']]
-        vec_examples.append(vec_example)
 
-      print vec_examples[1:2]
+        for key in vec_example.keys():
+          vec_example[key] = np.array(vec_example[key])
+        vec_examples.append(vec_example)
+    self.vec_examples = vec_examples
+
+  def get_examples(self):
+    return self.vec_examples
 
   def get_max_lengths(self):
     return self.maxlen
