@@ -5,8 +5,9 @@ import csv
 import random
 
 from collections import defaultdict
-
 from tqdm import tqdm
+
+from data_utils import union
 
 PIPE = "|"
 COMMA = ","
@@ -17,6 +18,7 @@ NEWLINE = "\n"
 words = set([])
 entities = set([])
 relations = set([])
+all = set([])
 
 
 def add_entity(entity):
@@ -86,3 +88,5 @@ if __name__ == "__main__":
   write_idx(path_prefix + "{name}_word_idx.txt".format(name=dataset_name), words)
   write_idx(path_prefix + "{name}_relation_idx.txt".format(name=dataset_name), relations)
   write_idx(path_prefix + "{name}_entity_idx.txt".format(name=dataset_name), entities)
+  all = union(words, entities, relations)
+  write_idx(path_prefix + "{name}_idx.txt".format(name=dataset_name), all)
