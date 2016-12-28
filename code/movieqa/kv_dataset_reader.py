@@ -89,6 +89,9 @@ class DatasetReader(object):
           #Don't pad ans entities because they won't be fed directly
           if key != 'ans_entities':
             vec_example[key] = pad(vec_example[key], self.maxlen[key])
+          else:
+            #answers should be in [0,count_entities-1]!!!
+            vec_example[key] = [label-1 for label in vec_example[key]]
 
         for key in vec_example.keys():
           vec_example[key] = np.array(vec_example[key])
