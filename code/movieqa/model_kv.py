@@ -24,7 +24,7 @@ class KeyValueMemNN(object):
     self.count_entities = entity_idx_size
     self.build_inputs()
     self.build_params()
-    logits = self.build_model()
+    logits = self.build_model() #batch_size * count_entities
     self.loss_op = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits, self.answer))
     self.optimizer = tf.train.AdamOptimizer(learning_rate=1e-2).minimize(self.loss_op)
     self.predict_op = tf.argmax(logits, 1, name="predict_op")
@@ -45,23 +45,28 @@ class KeyValueMemNN(object):
   def build_params(self):
     flags = tf.app.flags
     embedding_size = flags.FLAGS.embedding_size
+    hops = flags.FLAGS.hops
     with tf.variable_scope(self.name):
-      #nil_word_slot = tf.zeros([1, embedding_size], tf.int32)
+      nil_word_slot = tf.zeros([1, embedding_size])
       initializer = tf.random_normal_initializer(stddev=0.1)
-      self.A = tf.Variable(initializer([self.vocab_size+1, embedding_size]), name='A') #embedding matrix
-      #A = tf.concat(0, [nil_word_slot, A_]) # vocab_size+1 * embedding_size
-      #self.A = tf.Variable(A, name="A")
+      A = tf.concat(0, [nil_word_slot, initializer([self.vocab_size, embedding_size])]) # vocab_size+1 * embedding_size
+      self.A = tf.Variable(A, name='A')
       self.B = tf.Variable(initializer([embedding_size, self.count_entities]), name='B')
-      self.H = tf.Variable(initializer([embedding_size, embedding_size]), name='H')
+      self.R_list = []
+      for k in  xrange(hops):
+        R_k = tf.Variable(initializer([embedding_size, embedding_size]), name='H')
+        self.R_list.append(R_k)
 
 
   def build_model(self):
+    flags = tf.app.flags
+    hops = flags.FLAGS.hops
     with tf.variable_scope(self.name):
       q_emb = tf.nn.embedding_lookup(self.A, self.question) #batch_size * size_question * embedding_size
       q_0 = tf.reduce_sum(q_emb, 1) #batch_size * embedding_size
       q = [q_0]
 
-      for hop in xrange(2):
+      for hop in xrange(hops):
         keys_emb = tf.nn.embedding_lookup(self.A,
                                           self.keys)  # batch_size * size_memory * 2 * embedding_size
         k = tf.reduce_sum(keys_emb, 2)  # batch_size * size_memory * embedding_size
@@ -77,7 +82,8 @@ class KeyValueMemNN(object):
         v_temp = tf.transpose(values_emb, [0,2,1]) #batch_size * embedding_size * size_memory
         o_k = tf.reduce_sum(v_temp * probs_temp, 2) #batch_size * embedding_size
 
-        q_k = tf.matmul(q[-1], self.H) + o_k
+        R_k = self.R_list[hop]
+        q_k = tf.matmul(q[-1], R_k) + o_k
         q.append(q_k)
       return tf.matmul(q_k, self.B)
 

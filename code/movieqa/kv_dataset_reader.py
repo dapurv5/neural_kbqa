@@ -14,8 +14,32 @@ from collections import defaultdict
 from tqdm import tqdm
 
 
+def get_maxlen(*paths):
+  maxlen = defaultdict(int)
+  for path in paths:
+    with open(path, 'r') as examples_file:
+      fields = ['question', 'qn_entities', 'ans_entities', 'sources', 'relations', 'targets']
+      reader = csv.DictReader(examples_file, delimiter=TAB, fieldnames=fields)
+      for row in reader:
+        example = {}
+        example['question'] = row['question'].split(SPACE)
+        example['qn_entities'] = row['qn_entities'].split(PIPE)
+        example['ans_entities'] = row['ans_entities'].split(PIPE)
+        example['sources'] = row['sources'].split(PIPE)
+        example['relations'] = row['relations'].split(PIPE)
+        example['targets'] = row['targets'].split(PIPE)
+
+        maxlen['question'] = max(len(example['question']), maxlen['question'])
+        maxlen['qn_entities'] = max(len(example['qn_entities']), maxlen['qn_entities'])
+        maxlen['ans_entities'] = max(len(example['ans_entities']), maxlen['ans_entities'])
+        maxlen['sources'] = max(len(example['sources']), maxlen['sources'])
+        maxlen['relations'] = maxlen['sources']
+        maxlen['targets'] = maxlen['sources']
+  return maxlen
+
+
 class DatasetReader(object):
-  def __init__(self, args, share_idx=True):
+  def __init__(self, args, maxlen, share_idx=True):
     self.share_idx = share_idx
     word_idx = read_file_as_dict(args.word_idx)
     self.word_idx_size = len(word_idx)
@@ -29,7 +53,7 @@ class DatasetReader(object):
     with open(args.input_examples, 'r') as input_examples_file:
       reader = csv.DictReader(input_examples_file, delimiter=TAB,
                               fieldnames=fields)
-      self.maxlen = defaultdict(int)
+      self.maxlen = maxlen
       self.num_examples = 0
       examples = []
       for row in tqdm(reader):
@@ -40,36 +64,31 @@ class DatasetReader(object):
         example['sources'] = row['sources'].split(PIPE)
         example['relations'] = row['relations'].split(PIPE)
         example['targets'] = row['targets'].split(PIPE)
-        self.maxlen['question'] = max(len(example['question']), self.maxlen['question'])
-        self.maxlen['qn_entities'] = max(len(example['qn_entities']), self.maxlen['qn_entities'])
-        self.maxlen['ans_entities'] = max(len(example['ans_entities']), self.maxlen['ans_entities'])
-        self.maxlen['sources'] = max(len(example['sources']), self.maxlen['sources'])
+        ##
         self.num_examples += 1
         examples.append(example)
-      self.maxlen['relations'] = self.maxlen['sources']
-      self.maxlen['targets'] = self.maxlen['sources']
-
       vec_examples = []
       for example in tqdm(examples):
         vec_example = {}
         for key in example.keys():
           encoder = None
-
           if key == 'question':
             encoder = word_idx
           elif key == 'relations':
             encoder = relation_idx
           else:
             encoder = entity_idx
-
           #override the dict to be used in encoding if dict has to be shared
           if self.share_idx:
             encoder = idx
-
-          #answers always encoded by entity_idx
+          #answers are always encoded by entity_idx !!!
           if key == 'ans_entities':
             encoder = entity_idx
-          vec_example[key] = pad([encoder[word] for word in example[key]], self.maxlen[key])
+          vec_example[key] = [encoder[word] for word in example[key]]
+
+          #Don't pad ans entities because they won't be fed directly
+          if key != 'ans_entities':
+            vec_example[key] = pad(vec_example[key], self.maxlen[key])
 
         for key in vec_example.keys():
           vec_example[key] = np.array(vec_example[key])

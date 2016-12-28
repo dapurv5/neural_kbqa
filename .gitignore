@@ -94,3 +94,4 @@ data/movieqa/wiki-entities_test_kv.txt
 data/movieqa/full_train_kv.txt
 data/movieqa/full_dev_kv.txt
 data/movieqa/full_test_kv.txt
+code/movieqa/checkpoints/
