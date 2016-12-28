@@ -126,7 +126,7 @@ def main(args):
       if epoch > 0 and epoch % FLAGS.save_interval == 0:
         save_model(sess)
       if epoch > 0 and epoch % FLAGS.evaluation_interval == 0:
-        test_accuracy = get_accuracy(model, train_examples)
+        test_accuracy = get_accuracy(model, test_examples)
         print "EPOCH={epoch}:TEST_ACCURACY={test_accuracy}".format(epoch=epoch,
                                                                    test_accuracy=test_accuracy)
 
