@@ -37,7 +37,7 @@ python gen_kv_data.py --input_examples ../../data/movieqa/clean_full_qa_dev.txt 
 
 
 
-python main_kv.py --train_examples ../../data/movieqa/wiki-entities_train_kv.txt --test_examples ../../data/movieqa/wiki-entities_test_kv.txt --dev_examples ../../data/movieqa/wiki-entities_dev_kv.txt --word_idx ../../data/movieqa/wiki-entities_word_idx.txt --entity_idx ../../data/movieqa/wiki-entities_entity_idx.txt --relation_idx ../../data/movieqa/wiki-entities_relation_idx.txt
+python main_kv.py --train_examples ../../data/movieqa/wiki-entities_train_kv.txt --test_examples ../../data/movieqa/wiki-entities_test_kv.txt --dev_examples ../../data/movieqa/wiki-entities_dev_kv.txt --word_idx ../../data/movieqa/wiki-entities_word_idx.txt --entity_idx ../../data/movieqa/wiki-entities_entity_idx.txt --relation_idx ../../data/movieqa/wiki-entities_relation_idx.txt --idx ../../data/movieqa/wiki-entities_idx.txt
 
 
 ```

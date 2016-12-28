@@ -101,7 +101,7 @@ def main(args):
   num_train = len(train_examples)
   batches = zip(range(0, num_train - batch_size, batch_size), range(batch_size, num_train, batch_size))
   batches = [(start, end) for start, end in batches]
-  batches = batches[0:10] #Uncomment this to run locally
+  #batches = batches[0:10] #Uncomment this to run locally
   with tf.Session() as sess:
     model = KeyValueMemNN(sess, maxlen, train_reader.get_idx_size(), train_reader.get_entity_idx_size())
     if os.path.exists(os.path.join(FLAGS.checkpoint_dir, "model_kv.ckpt")):
@@ -135,7 +135,7 @@ def get_accuracy(model , examples):
   num_examples = len(examples)
   batches = zip(range(0, num_examples - batch_size, batch_size), range(batch_size, num_examples, batch_size))
   batches = [(start, end) for start, end in batches]
-  batches = batches[0:10] #Uncomment this to run locally
+  #batches = batches[0:10] #Uncomment this to run locally
   count_correct = 0.0
   count_total = 0.0
   for start, end in batches:

@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -N main_kv_job
+#PBS -q ml_gpu
+#PBS -l walltime=42:00:00
+#PBS -l nodes=2:ppn=8
+#PBS -l mem=16gb
+#PBS -k oe
+#PBS -m ae
+#PBS -M apurvverma@gatech.edu
+
+cd $PBS_O_WORKDIR
+#echo "
+#==================================================
+#Node: `hostname`
+#Working directory: ${PWD}
+#==================================================
+#"
+
+module unload gcc
+module load gcc/4.9.0
+module load cudnn/7.5
+
+
+export PYTHONPATH="/nv/hcoc1/averma80/ProgramFiles/tensorflow_gpu":${PYTHONPATH}
+/usr/local/pacerepov1/python/2.7/gcc-4.9.0/bin/python main_kv.py --train_examples ../../data/movieqa/wiki-entities_train_kv.txt --test_examples ../../data/movieqa/wiki-entities_test_kv.txt --dev_examples ../../data/movieqa/wiki-entities_dev_kv.txt --word_idx ../../data/movieqa/wiki-entities_word_idx.txt --entity_idx ../../data/movieqa/wiki-entities_entity_idx.txt --relation_idx ../../data/movieqa/wiki-entities_relation_idx.txt --idx ../../data/movieqa/wiki-entities_idx.txt
