@@ -26,7 +26,7 @@ class KeyValueMemNN(object):
     self.build_params()
     logits = self.build_model() #batch_size * count_entities
     self.loss_op = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits, self.answer))
-    self.optimizer = tf.train.AdamOptimizer(learning_rate=1e-2).minimize(self.loss_op)
+    self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=1e-4).minimize(self.loss_op)
     self.predict_op = tf.argmax(logits, 1, name="predict_op")
     init_op = tf.initialize_all_variables()
     self.sess.run(init_op)
