@@ -113,6 +113,7 @@ def main(args):
     max_test_accuracy = 0
     for epoch in range(1, FLAGS.epochs+1):
       np.random.shuffle(batches) #comment to run locally
+      #print model.get_nil_word_embedding()
       for start, end in batches:
         batch_examples = train_examples[start:end]
         batch_dict = prepare_batch(batch_examples)

@@ -14,10 +14,10 @@ from data_utils import *
 from tqdm import tqdm
 
 
-MAX_RELEVANT_ENTITIES = 30
+MAX_RELEVANT_ENTITIES = 4
 HOPS_FROM_QN_ENTITY = 1
-MAX_CANDIDATE_ENTITIES = 128
-MAX_CANDIDATE_TUPLES = 1024
+MAX_CANDIDATE_ENTITIES = 64
+MAX_CANDIDATE_TUPLES = 512
 
 
 def remove_high_degree_qn_entities(qn_entities):
@@ -72,9 +72,7 @@ def main(args):
         qn_entities = remove_high_degree_qn_entities(qn_entities)
         relevant_entities = search_index.get_candidate_docs(question, limit=MAX_RELEVANT_ENTITIES)
         nbr_qn_entities = get_neighboring_entities(qn_entities, num_hops=HOPS_FROM_QN_ENTITY)
-        candidate_entities = union(qn_entities, relevant_entities, nbr_qn_entities)
-        if args.mode == "train":
-          candidate_entities = candidate_entities.union(ans_entities)
+        candidate_entities = union(relevant_entities, nbr_qn_entities)
         # Clip candidate entities by stochastically sampling a subset
         if len(candidate_entities) > MAX_CANDIDATE_ENTITIES:
           candidate_entities = set(random.sample(candidate_entities, MAX_CANDIDATE_ENTITIES))
@@ -102,7 +100,6 @@ if __name__ == "__main__":
   parser.add_argument('--input_doc', help='the doc file', required=False)
   parser.add_argument('--stopwords', help='stopwords file', required=False)
   parser.add_argument('--output_examples', help='the processed output file', required=True)
-  parser.add_argument('--mode', help='train or test mode', required=True)
   args = parser.parse_args()
 
   #global variables

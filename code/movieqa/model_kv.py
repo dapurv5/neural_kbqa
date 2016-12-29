@@ -48,11 +48,11 @@ class KeyValueMemNN(object):
     embedding_size = flags.FLAGS.embedding_size
     hops = flags.FLAGS.hops
     with tf.variable_scope(self.name):
-      nil_word_slot = tf.zeros([1, embedding_size])
+      nil_word_slot = tf.constant(np.zeros([1, embedding_size]), dtype=tf.float32)
       #initializer = tf.random_normal_initializer(stddev=0.1)
       initializer = tf.contrib.layers.xavier_initializer()
-      A = tf.concat(0, [nil_word_slot, initializer([self.vocab_size, embedding_size])]) # vocab_size+1 * embedding_size
-      self.A = tf.Variable(A, name='A')
+      E = tf.Variable(initializer([self.vocab_size, embedding_size]), name='E')
+      self.A = tf.concat(0, [nil_word_slot, E]) # vocab_size+1 * embedding_size
       self.B = tf.Variable(initializer([embedding_size, self.count_entities]), name='B')
       self.R_list = []
       for k in  xrange(hops):
@@ -67,7 +67,8 @@ class KeyValueMemNN(object):
     memory_size = self.size[KEYS]
 
     with tf.variable_scope(self.name):
-      self.reset_updates_to_nil_word_embedding()
+      #this was leading to poorer performance
+      #self.reset_updates_to_nil_word_embedding()
       q_emb = tf.nn.embedding_lookup(self.A, self.question) #batch_size * size_question * embedding_size
       q_0 = tf.reduce_sum(q_emb, 1) #batch_size * embedding_size
       q = [q_0]
@@ -134,13 +135,13 @@ class KeyValueMemNN(object):
     indices = [0]
     return self.sess.run(tf.gather(self.A, indices))
 
-  #scatter_update could only be applied to Variable types :(
-  def reset_updates_to_nil_word_embedding(self):
-    flags = tf.app.flags
-    embedding_size = flags.FLAGS.embedding_size
-    nil_word_slot = tf.zeros([1, embedding_size])
-    row1_n = tf.gather(self.A, range(1, self.vocab_size))
-    self.A = tf.concat(0, [nil_word_slot, row1_n])
+  # #scatter_update could only be applied to Variable types :(
+  # def reset_updates_to_nil_word_embedding(self):
+  #   flags = tf.app.flags
+  #   embedding_size = flags.FLAGS.embedding_size
+  #   nil_word_slot = tf.zeros([1, embedding_size])
+  #   row1_n = tf.gather(self.A, range(1, self.vocab_size))
+  #   self.A = tf.concat(0, [nil_word_slot, row1_n])
 
 
 
