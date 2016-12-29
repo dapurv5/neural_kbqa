@@ -16,11 +16,11 @@ flags.DEFINE_float("learning_rate", 0.01, "Learning rate for Adam Optimizer.")
 flags.DEFINE_float("epsilon", 1e-8, "Epsilon value for Adam Optimizer.")
 flags.DEFINE_float("max_grad_norm", 40.0, "Clip gradients to this norm.")
 flags.DEFINE_integer("evaluation_interval", 5, "Evaluate and print results every x epochs")
-flags.DEFINE_integer("save_interval", 10, "save model every x epochs")
 flags.DEFINE_integer("batch_size", 256, "Batch size for training.")
-flags.DEFINE_integer("hops", 3, "Number of hops in the Memory Network.")
+flags.DEFINE_integer("hops", 2, "Number of hops in the Memory Network.")
 flags.DEFINE_integer("epochs", 1000, "Number of epochs to train for.")
 flags.DEFINE_integer("embedding_size", 128, "Embedding size for embedding matrices.")
+flags.DEFINE_integer("dropout_memory", 0.3, "keep probability for keeping a memory slot")
 flags.DEFINE_string("checkpoint_dir", "checkpoints", "checkpoint directory [checkpoints]")
 
 
@@ -101,7 +101,7 @@ def main(args):
   num_train = len(train_examples)
   batches = zip(range(0, num_train - batch_size, batch_size), range(batch_size, num_train, batch_size))
   batches = [(start, end) for start, end in batches]
-  #batches = batches[0:100] #Uncomment this to run locally
+  #batches = batches[0:10] #Uncomment this to run locally
   with tf.Session() as sess:
     model = KeyValueMemNN(sess, maxlen, train_reader.get_idx_size(), train_reader.get_entity_idx_size())
     if os.path.exists(os.path.join(FLAGS.checkpoint_dir, "model_kv.ckpt")):
@@ -110,9 +110,9 @@ def main(args):
       saver.restore(sess, save_path)
       print("Model restored from file: %s" % save_path)
 
+    max_test_accuracy = 0
     for epoch in range(1, FLAGS.epochs+1):
       np.random.shuffle(batches) #comment to run locally
-      sum_prob_of_error = 0
       for start, end in batches:
         batch_examples = train_examples[start:end]
         batch_dict = prepare_batch(batch_examples)
@@ -120,22 +120,24 @@ def main(args):
         predictions = model.predict(batch_dict)
         labels = tf.constant(batch_dict[ANSWER], tf.int64)
         train_accuracy = tf.contrib.metrics.accuracy(predictions, labels)
-        print "EPOCH={epoch}:TRAIN_LOSS={class_loss}:TRAIN_ACC:{train_acc}".\
+        print "EPOCH={epoch}:BATCH_TRAIN_LOSS={class_loss}:BATCH_TRAIN_ACC:{train_acc}".\
           format(epoch=epoch, class_loss=prob_of_error, train_acc=sess.run(train_accuracy))
-        sum_prob_of_error += prob_of_error
-      if epoch > 0 and epoch % FLAGS.save_interval == 0:
-        save_model(sess)
+
       if epoch > 0 and epoch % FLAGS.evaluation_interval == 0:
         test_accuracy = get_accuracy(model, test_examples)
-        print "EPOCH={epoch}:TEST_ACCURACY={test_accuracy}".format(epoch=epoch,
-                                                                   test_accuracy=test_accuracy)
+        train_accuracy = get_accuracy(model, train_examples)
+        if test_accuracy > max_test_accuracy:
+          save_model(sess)
+          max_test_accuracy = test_accuracy
+        print "EPOCH={epoch}:TEST_ACCURACY={test_accuracy}:TRAIN_ACCURACY={train_accuracy}:BEST_ACC={best_acc}".\
+          format(epoch=epoch, test_accuracy=test_accuracy, train_accuracy=train_accuracy, best_acc=max_test_accuracy)
 
 def get_accuracy(model , examples):
   batch_size = FLAGS.batch_size
   num_examples = len(examples)
   batches = zip(range(0, num_examples - batch_size, batch_size), range(batch_size, num_examples, batch_size))
   batches = [(start, end) for start, end in batches]
-  #batches = batches[0:100] #Uncomment this to run locally
+  #batches = batches[0:10] #Uncomment this to run locally
   count_correct = 0.0
   count_total = 0.0
   for start, end in batches:
