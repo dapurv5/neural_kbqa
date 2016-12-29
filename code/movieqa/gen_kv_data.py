@@ -72,7 +72,7 @@ def main(args):
         qn_entities = remove_high_degree_qn_entities(qn_entities)
         relevant_entities = search_index.get_candidate_docs(question, limit=MAX_RELEVANT_ENTITIES)
         nbr_qn_entities = get_neighboring_entities(qn_entities, num_hops=HOPS_FROM_QN_ENTITY)
-        candidate_entities = union(relevant_entities, nbr_qn_entities)
+        candidate_entities = union(qn_entities, relevant_entities, nbr_qn_entities)
         # Clip candidate entities by stochastically sampling a subset
         if len(candidate_entities) > MAX_CANDIDATE_ENTITIES:
           candidate_entities = set(random.sample(candidate_entities, MAX_CANDIDATE_ENTITIES))
