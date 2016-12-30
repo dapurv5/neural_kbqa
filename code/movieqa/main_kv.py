@@ -10,6 +10,7 @@ import tqdm
 from kv_dataset_reader import DatasetReader
 from kv_dataset_reader import get_maxlen
 from model_kv import KeyValueMemNN
+from data_utils import *
 
 flags = tf.app.flags
 flags.DEFINE_float("learning_rate", 0.01, "Learning rate for Adam Optimizer.")
@@ -19,9 +20,10 @@ flags.DEFINE_integer("evaluation_interval", 5, "Evaluate and print results every
 flags.DEFINE_integer("batch_size", 256, "Batch size for training.")
 flags.DEFINE_integer("hops", 2, "Number of hops in the Memory Network.")
 flags.DEFINE_integer("epochs", 1000, "Number of epochs to train for.")
-flags.DEFINE_integer("embedding_size", 128, "Embedding size for embedding matrices.")
-flags.DEFINE_integer("dropout_memory", 0.3, "keep probability for keeping a memory slot")
+flags.DEFINE_integer("embedding_size", 256, "Embedding size for embedding matrices.")
+flags.DEFINE_integer("dropout_memory", 0.8, "keep probability for keeping a memory slot")
 flags.DEFINE_string("checkpoint_dir", "checkpoints", "checkpoint directory [checkpoints]")
+flags.DEFINE_integer("max_slots", 128, "maximum slots in the memory")
 
 
 FLAGS = flags.FLAGS
@@ -36,16 +38,16 @@ KEYS = "keys"
 VALUES = "values"
 
 
-def prepare_batch(batch_examples):
+def prepare_batch(batch_examples, maxlen):
   batch_size = FLAGS.batch_size
   batch_dict = {}
-  batch_dict[QUESTION] = gather_single_column_from_batch(batch_examples, QUESTION)
-  batch_dict[QN_ENTITIES] = gather_single_column_from_batch(batch_examples, QN_ENTITIES)
-  batch_dict[SOURCES] = gather_single_column_from_batch(batch_examples, SOURCES)
-  batch_dict[RELATIONS] = gather_single_column_from_batch(batch_examples, RELATIONS)
-  batch_dict[TARGETS] = gather_single_column_from_batch(batch_examples, TARGETS)
-  batch_dict[KEYS] = gather_key_from_batch(batch_examples)
-  batch_dict[VALUES] = gather_single_column_from_batch(batch_examples, TARGETS)
+  batch_dict[QUESTION] = gather_single_column_from_batch(batch_examples, maxlen, QUESTION)
+  batch_dict[QN_ENTITIES] = gather_single_column_from_batch(batch_examples,maxlen, QN_ENTITIES)
+  batch_dict[SOURCES] = gather_single_column_from_batch(batch_examples, maxlen, SOURCES)
+  batch_dict[RELATIONS] = gather_single_column_from_batch(batch_examples, maxlen, RELATIONS)
+  batch_dict[TARGETS] = gather_single_column_from_batch(batch_examples, maxlen, TARGETS)
+  batch_dict[KEYS], batch_dict[VALUES] = gather_key_and_value_from_batch(batch_examples, maxlen)
+  #batch_dict[VALUES] = gather_single_column_from_batch(batch_examples, TARGETS)
   labels = np.zeros([batch_size])
   for i in xrange(batch_size):
     labels[i] = random.sample(batch_examples[i][ANS_ENTITIES], 1)[0]
@@ -53,26 +55,57 @@ def prepare_batch(batch_examples):
   return batch_dict
 
 
-def gather_single_column_from_batch(batch_examples, column_name):
+def gather_single_column_from_batch(batch_examples, maxlen, column_name):
   batch_size = FLAGS.batch_size
   column = []
   for i in xrange(batch_size):
-    column.append(batch_examples[i][column_name])
+    example = pad(batch_examples[i][column_name], maxlen[column_name])
+    column.append(np.array(example))
   return np.array(column) #batch_size * maxlen(column_name)
 
-def gather_key_from_batch(batch_examples):
+# def gather_key_from_batch(batch_examples):
+#   batch_size = FLAGS.batch_size
+#   column = []
+#   for i in xrange(batch_size):
+#     assert(len(batch_examples[i][SOURCES] == len(batch_examples[i][RELATIONS])))
+#     memory_length = len(batch_examples[i][SOURCES])
+#     memories = []
+#     src = batch_examples[i][SOURCES]
+#     rel = batch_examples[i][RELATIONS]
+#     for memory_index in xrange(memory_length):
+#       memories.append(np.array([src[memory_index], rel[memory_index]]))
+#     column.append(np.array(memories))
+#   return np.array(column) #batch_size * memory_length * 2
+
+def gather_key_and_value_from_batch(batch_examples, maxlen):
   batch_size = FLAGS.batch_size
-  column = []
+  column_key = []
+  column_val = []
   for i in xrange(batch_size):
-    assert(len(batch_examples[i][SOURCES] == len(batch_examples[i][RELATIONS])))
-    memory_length = len(batch_examples[i][SOURCES])
-    memories = []
+    assert(len(batch_examples[i][SOURCES]) == len(batch_examples[i][RELATIONS]))
+    assert (len(batch_examples[i][SOURCES]) == len(batch_examples[i][TARGETS]))
+    example_length = len(batch_examples[i][SOURCES])
+    memories_key = []
+    memories_val = []
     src = batch_examples[i][SOURCES]
     rel = batch_examples[i][RELATIONS]
-    for memory_index in xrange(memory_length):
-      memories.append(np.array([src[memory_index], rel[memory_index]]))
-    column.append(np.array(memories))
-  return np.array(column) #batch_size * memory_length * 2
+    tar = batch_examples[i][TARGETS]
+    if maxlen[KEYS] > example_length:
+      #pad sources, relations and targets in each example
+      src = pad(src, maxlen[KEYS])
+      rel = pad(rel, maxlen[RELATIONS])
+      tar = pad(tar, maxlen[TARGETS])
+      example_indices_to_pick = range(len(src))
+    else:
+      example_indices_to_pick = random.sample(range(example_length), maxlen[KEYS])
+
+    for memory_index in example_indices_to_pick:
+      memories_key.append(np.array([src[memory_index], rel[memory_index]]))
+      memories_val.append(tar[memory_index])
+
+    column_key.append(np.array(memories_key))
+    column_val.append(np.array(memories_val))
+  return np.array(column_key), np.array(column_val) #batch_size * memory_length * 2, batch_size * memory_length
 
 
 def save_model(sess):
@@ -84,9 +117,10 @@ def save_model(sess):
 
 
 def main(args):
+  max_slots = FLAGS.max_slots
   maxlen = get_maxlen(args.train_examples, args.test_examples, args.dev_examples)
-  maxlen[KEYS], maxlen[VALUES] = maxlen[SOURCES], maxlen[SOURCES]
-
+  maxlen[KEYS], maxlen[VALUES] = min(maxlen[SOURCES], max_slots), min(maxlen[SOURCES], max_slots)
+  assert(maxlen[KEYS] == maxlen[VALUES])
   args.input_examples = args.train_examples
   train_reader = DatasetReader(args, maxlen, share_idx=True)
   train_examples = train_reader.get_examples()
@@ -116,7 +150,7 @@ def main(args):
       #print model.get_nil_word_embedding()
       for start, end in batches:
         batch_examples = train_examples[start:end]
-        batch_dict = prepare_batch(batch_examples)
+        batch_dict = prepare_batch(batch_examples, maxlen)
         prob_of_error = model.batch_fit(batch_dict)
         predictions = model.predict(batch_dict)
         labels = tf.constant(batch_dict[ANSWER], tf.int64)
@@ -125,15 +159,15 @@ def main(args):
           format(epoch=epoch, class_loss=prob_of_error, train_acc=sess.run(train_accuracy))
 
       if epoch > 0 and epoch % FLAGS.evaluation_interval == 0:
-        test_accuracy = get_accuracy(model, test_examples)
-        train_accuracy = get_accuracy(model, train_examples)
+        test_accuracy = get_accuracy(model, test_examples, maxlen)
+        train_accuracy = get_accuracy(model, train_examples, maxlen)
         if test_accuracy > max_test_accuracy:
           save_model(sess)
           max_test_accuracy = test_accuracy
         print "EPOCH={epoch}:TEST_ACCURACY={test_accuracy}:TRAIN_ACCURACY={train_accuracy}:BEST_ACC={best_acc}".\
           format(epoch=epoch, test_accuracy=test_accuracy, train_accuracy=train_accuracy, best_acc=max_test_accuracy)
 
-def get_accuracy(model , examples):
+def get_accuracy(model , examples, maxlen):
   batch_size = FLAGS.batch_size
   num_examples = len(examples)
   batches = zip(range(0, num_examples - batch_size, batch_size), range(batch_size, num_examples, batch_size))
@@ -143,7 +177,7 @@ def get_accuracy(model , examples):
   count_total = 0.0
   for start, end in batches:
     batch_examples = examples[start:end]
-    batch_dict = prepare_batch(batch_examples)
+    batch_dict = prepare_batch(batch_examples, maxlen)
     predictions = model.predict(batch_dict)
     for i in xrange(len(batch_examples)):
       correct_answers = set(batch_examples[i][ANS_ENTITIES])

@@ -86,15 +86,10 @@ class DatasetReader(object):
             encoder = entity_idx
           vec_example[key] = [encoder[word] for word in example[key]]
 
-          #Don't pad ans entities because they won't be fed directly
-          if key != 'ans_entities':
-            vec_example[key] = pad(vec_example[key], self.maxlen[key])
-          else:
-            #answers should be in [0,count_entities-1]!!!
-            vec_example[key] = [label-1 for label in vec_example[key]]
+          if key == 'ans_entities':
+            # answers should be in [0,count_entities-1]!!!
+            vec_example[key] = [label - 1 for label in vec_example[key]]
 
-        for key in vec_example.keys():
-          vec_example[key] = np.array(vec_example[key])
         vec_examples.append(vec_example)
     self.vec_examples = vec_examples
 

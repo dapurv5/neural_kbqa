@@ -31,7 +31,8 @@ def get_str_of_nested_seq(paths):
 
 
 def pad(arr, L):
-  assert (len(arr) <= L)
-  while len(arr) < L:
-    arr.append(0)
-  return arr
+  arr_cpy = list(arr)
+  assert (len(arr_cpy) <= L)
+  while len(arr_cpy) < L:
+    arr_cpy.append(0)
+  return arr_cpy

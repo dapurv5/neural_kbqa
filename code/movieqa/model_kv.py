@@ -81,11 +81,11 @@ class KeyValueMemNN(object):
         #apply dropout on keys
         ones = tf.ones([memory_size, 1], tf.float32)
         ones_dropout = tf.nn.dropout(ones, self.dropout_memory, noise_shape=[memory_size, 1])
-        k_dropout = k * ones_dropout
+        #k_dropout = k * ones_dropout
 
         q_temp = tf.expand_dims(q[-1],-1) # batch_size * embedding_size * 1
         q_temp1 = tf.transpose(q_temp, [0, 2, 1])  # batch_size * 1 * embedding_size
-        prod = k_dropout * q_temp1  # batch_size * size_memory * embedding_size
+        prod = k * q_temp1  # batch_size * size_memory * embedding_size
         dotted = tf.reduce_sum(prod, 2) # batch_size * size_memory
         probs = tf.nn.softmax(dotted) # batch_size * size_memory
 
