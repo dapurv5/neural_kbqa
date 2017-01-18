@@ -20,10 +20,10 @@ flags.DEFINE_integer("evaluation_interval", 5, "Evaluate and print results every
 flags.DEFINE_integer("batch_size", 256, "Batch size for training.")
 flags.DEFINE_integer("hops", 2, "Number of hops in the Memory Network.")
 flags.DEFINE_integer("epochs", 1000, "Number of epochs to train for.")
-flags.DEFINE_integer("embedding_size", 256, "Embedding size for embedding matrices.")
-flags.DEFINE_integer("dropout_memory", 0.8, "keep probability for keeping a memory slot")
+flags.DEFINE_integer("embedding_size", 512, "Embedding size for embedding matrices.")
+flags.DEFINE_integer("dropout_memory", 1.0, "keep probability for keeping a memory slot")
 flags.DEFINE_string("checkpoint_dir", "checkpoints", "checkpoint directory [checkpoints]")
-flags.DEFINE_integer("max_slots", 128, "maximum slots in the memory")
+flags.DEFINE_integer("max_slots", 1024, "maximum slots in the memory")
 
 
 FLAGS = flags.FLAGS
@@ -49,33 +49,29 @@ def prepare_batch(batch_examples, maxlen):
   batch_dict[KEYS], batch_dict[VALUES] = gather_key_and_value_from_batch(batch_examples, maxlen)
   #batch_dict[VALUES] = gather_single_column_from_batch(batch_examples, TARGETS)
   labels = np.zeros([batch_size])
+  labels = []
   for i in xrange(batch_size):
-    labels[i] = random.sample(batch_examples[i][ANS_ENTITIES], 1)[0]
-  batch_dict[ANSWER] = labels
+    for ans in batch_examples[i][ANS_ENTITIES]:
+      labels.append(ans)
+  batch_dict[ANSWER] = np.array(labels)
+  print batch_dict[ANSWER], batch_dict[QUESTION]
   return batch_dict
 
 
 def gather_single_column_from_batch(batch_examples, maxlen, column_name):
+  """ Gathers a single column, dupes the questions which have multiple answers to ensure
+  answers with multiple answers are fed in a single batch instead of randomly picking up one.
+  NOTE: The size of the batch fed can be larger than the batch_size specified because of this
+  """
   batch_size = FLAGS.batch_size
   column = []
   for i in xrange(batch_size):
+    num_ans = len(batch_examples[i][ANS_ENTITIES])
     example = pad(batch_examples[i][column_name], maxlen[column_name])
-    column.append(np.array(example))
+    for j in xrange(num_ans):
+      column.append(np.array(example))
   return np.array(column) #batch_size * maxlen(column_name)
 
-# def gather_key_from_batch(batch_examples):
-#   batch_size = FLAGS.batch_size
-#   column = []
-#   for i in xrange(batch_size):
-#     assert(len(batch_examples[i][SOURCES] == len(batch_examples[i][RELATIONS])))
-#     memory_length = len(batch_examples[i][SOURCES])
-#     memories = []
-#     src = batch_examples[i][SOURCES]
-#     rel = batch_examples[i][RELATIONS]
-#     for memory_index in xrange(memory_length):
-#       memories.append(np.array([src[memory_index], rel[memory_index]]))
-#     column.append(np.array(memories))
-#   return np.array(column) #batch_size * memory_length * 2
 
 def gather_key_and_value_from_batch(batch_examples, maxlen):
   batch_size = FLAGS.batch_size
@@ -103,8 +99,10 @@ def gather_key_and_value_from_batch(batch_examples, maxlen):
       memories_key.append(np.array([src[memory_index], rel[memory_index]]))
       memories_val.append(tar[memory_index])
 
-    column_key.append(np.array(memories_key))
-    column_val.append(np.array(memories_val))
+    num_ans = len(batch_examples[i][ANS_ENTITIES])
+    for j in xrange(num_ans):
+      column_key.append(np.array(memories_key))
+      column_val.append(np.array(memories_val))
   return np.array(column_key), np.array(column_val) #batch_size * memory_length * 2, batch_size * memory_length
 
 

@@ -16,8 +16,8 @@ from tqdm import tqdm
 
 MAX_RELEVANT_ENTITIES = 4
 HOPS_FROM_QN_ENTITY = 1
-MAX_CANDIDATE_ENTITIES = 64
-MAX_CANDIDATE_TUPLES = 512
+MAX_CANDIDATE_ENTITIES = 1024
+MAX_CANDIDATE_TUPLES = 2048
 
 
 def remove_high_degree_qn_entities(qn_entities):

@@ -35,11 +35,11 @@ class KeyValueMemNN(object):
   def build_inputs(self):
     flags = tf.app.flags
     batch_size = flags.FLAGS.batch_size
-    self.question = tf.placeholder(tf.int32, [batch_size, self.size[QUESTION]], name="question")
-    self.qn_entities = tf.placeholder(tf.int32, [batch_size, self.size[QN_ENTITIES]], name="qnEntities")
-    self.answer = tf.placeholder(tf.int32, shape=[batch_size], name="answer")
-    self.keys = tf.placeholder(tf.int32, [batch_size, self.size[KEYS], 2], name="keys")
-    self.values = tf.placeholder(tf.int32, [batch_size, self.size[VALUES]], name="values")
+    self.question = tf.placeholder(tf.int32, [None, self.size[QUESTION]], name="question")
+    self.qn_entities = tf.placeholder(tf.int32, [None, self.size[QN_ENTITIES]], name="qnEntities")
+    self.answer = tf.placeholder(tf.int32, shape=[None], name="answer")
+    self.keys = tf.placeholder(tf.int32, [None, self.size[KEYS], 2], name="keys")
+    self.values = tf.placeholder(tf.int32, [None, self.size[VALUES]], name="values")
     self.dropout_memory = tf.placeholder(tf.float32)
 
 
@@ -99,6 +99,7 @@ class KeyValueMemNN(object):
         o_k = tf.reduce_sum(v_temp * probs_temp, 2) #batch_size * embedding_size
 
         R_k = self.R_list[hop]
+        R_1 = self.R_list[0] #Reuse the R matrix
         q_k = tf.matmul(q[-1], R_k) + o_k
         q.append(q_k)
       return tf.matmul(q_k, self.B)
