@@ -100,7 +100,7 @@ class KeyValueMemNN(object):
 
         R_k = self.R_list[hop]
         R_1 = self.R_list[0] #Reuse the R matrix
-        q_k = tf.matmul(q[-1], R_k) + o_k
+        q_k = tf.matmul(q[-1], R_1) + o_k
         q.append(q_k)
       return tf.matmul(q_k, self.B)
 
