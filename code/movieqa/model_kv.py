@@ -25,7 +25,7 @@ class KeyValueMemNN(object):
     self.build_inputs()
     self.build_params()
     logits = self.build_model() #batch_size * count_entities
-    self.loss_op = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits, self.answer))
+    self.loss_op = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=self.answer))
     self.optimizer = tf.train.AdamOptimizer().minimize(self.loss_op)
     self.predict_op = tf.argmax(logits, 1, name="predict_op")
     init_op = tf.initialize_all_variables()
@@ -52,7 +52,7 @@ class KeyValueMemNN(object):
       #initializer = tf.random_normal_initializer(stddev=0.1)
       initializer = tf.contrib.layers.xavier_initializer()
       E = tf.Variable(initializer([self.vocab_size, embedding_size]), name='E')
-      self.A = tf.concat(0, [nil_word_slot, E]) # vocab_size+1 * embedding_size
+      self.A = tf.concat([nil_word_slot, E], 0) # vocab_size+1 * embedding_size
       self.B = tf.Variable(initializer([embedding_size, self.count_entities]), name='B')
       self.R_list = []
       for k in  xrange(hops):
