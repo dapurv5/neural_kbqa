@@ -17,13 +17,13 @@ flags.DEFINE_float("learning_rate", 0.01, "Learning rate for Adam Optimizer.")
 flags.DEFINE_float("epsilon", 1e-8, "Epsilon value for Adam Optimizer.")
 flags.DEFINE_float("max_grad_norm", 40.0, "Clip gradients to this norm.")
 flags.DEFINE_integer("evaluation_interval", 5, "Evaluate and print results every x epochs")
-flags.DEFINE_integer("batch_size", 64, "Batch size for training.")
+flags.DEFINE_integer("batch_size", 8, "Batch size for training.")
 flags.DEFINE_integer("hops", 2, "Number of hops in the Memory Network.")
 flags.DEFINE_integer("epochs", 1000, "Number of epochs to train for.")
-flags.DEFINE_integer("embedding_size", 512, "Embedding size for embedding matrices.")
+flags.DEFINE_integer("embedding_size", 128, "Embedding size for embedding matrices.")
 flags.DEFINE_integer("dropout_memory", 1.0, "keep probability for keeping a memory slot")
 flags.DEFINE_string("checkpoint_dir", "checkpoints", "checkpoint directory [checkpoints]")
-flags.DEFINE_integer("max_slots", 1024, "maximum slots in the memory")
+flags.DEFINE_integer("max_slots", 64, "maximum slots in the memory")
 
 
 FLAGS = flags.FLAGS
